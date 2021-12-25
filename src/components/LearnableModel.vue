@@ -79,7 +79,7 @@ export default {
       raw_predictions: [], // stores raw probabilities of prediction for all classes
       mousePressed: false, // propagate mouse press event into component
       coords: [], // stores all coordinates of points on drawing
-      brushWidth: 20, // stores width of brush
+      brushWidth: 5, // stores width of brush
       numConv1: 8, // dimension of first conv layer
       numConv2: 16, // dimension of second conv layer
       numDense: 64, // dimension of dense layer
@@ -170,8 +170,8 @@ export default {
     },
     storeDrawing(obj) {
       let img_data = this.getImageData();
-
       let that = this;
+      console.log(img_data)
       this.db.add_photo(img_data, obj).then(() => {
         this.$toasted.show("Thanks for adding a '" + obj + "'");
         that.clearCanvas();

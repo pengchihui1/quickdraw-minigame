@@ -2,16 +2,21 @@
 <template>
   <div class="container">
     <!-- Loading screen -->
-    <loading :active="!loadingModelOver" :can-cancel="false" :is-full-page="true" color="#428bca"></loading>
+    <loading
+      :active="!loadingModelOver"
+      :can-cancel="false"
+      :is-full-page="true"
+      color="#428bca"
+    ></loading>
 
     <!-- Header for component -->
-    <h1 class="header">Draw all {{getLengthNames}} classes !</h1>
+    <h1 class="header">Draw all {{ getLengthNames }} classes !</h1>
     <div class="main">
       <label>Select your difficulty</label>
       <toggle-button
         class="toggle"
         v-model="toggleBigModel"
-        :labels="{checked: 'Big', unchecked: 'Small'}"
+        :labels="{ checked: 'Big', unchecked: 'Small' }"
         :width="70"
         color="#428bca"
       />
@@ -79,7 +84,7 @@ export default {
     "v-chart": ECharts,
     VueGoodTable,
     VueSlider,
-    Loading
+    Loading,
   },
   data() {
     return {
@@ -93,8 +98,8 @@ export default {
       toggleBigModel: false, // switch variable between small and big model
       tableColumns: [
         { label: "Class", field: "class" },
-        { label: "Submitted", field: "submitted", type: "number" }
-      ]
+        { label: "Submitted", field: "submitted", type: "number" },
+      ],
     };
   },
   methods: {
@@ -114,25 +119,25 @@ export default {
       /**
        * Get top left and bottom right coords of bounding box of the drawing
        */
-      var coorX = this.coords.map(function(p) {
+      var coorX = this.coords.map(function (p) {
         return p.x;
       });
-      var coorY = this.coords.map(function(p) {
+      var coorY = this.coords.map(function (p) {
         return p.y;
       });
 
       var min_coords = {
         x: Math.min.apply(null, coorX),
-        y: Math.min.apply(null, coorY)
+        y: Math.min.apply(null, coorY),
       };
       var max_coords = {
         x: Math.max.apply(null, coorX),
-        y: Math.max.apply(null, coorY)
+        y: Math.max.apply(null, coorY),
       };
 
       return {
         min: min_coords,
-        max: max_coords
+        max: max_coords,
       };
     },
     submitCanvas() {
@@ -190,18 +195,18 @@ export default {
        * Convert results object in component to list for vue-good-table
        */
       if (!this.toggleBigModel) {
-        return Object.keys(this.small_ranking).map(key => {
+        return Object.keys(this.small_ranking).map((key) => {
           return { class: key, submitted: this.small_ranking[key] };
         });
       } else {
-        return Object.keys(this.big_ranking).map(key => {
+        return Object.keys(this.big_ranking).map((key) => {
           return { class: key, submitted: this.big_ranking[key] };
         });
       }
-    }
+    },
   },
   computed: {
-    findIndicesOfMax: function() {
+    findIndicesOfMax: function () {
       /**
        * Get indices of 5 classes with highest predicted probabilities
        */
@@ -210,7 +215,7 @@ export default {
         outp.push(i); // add index to output array
         if (outp.length > 5) {
           let pred = this.raw_predictions;
-          outp.sort(function(a, b) {
+          outp.sort(function (a, b) {
             return pred[b] - pred[a];
           }); // descending sort the output array
           outp.pop(); // remove the last index (index of smallest element in output array)
@@ -218,7 +223,7 @@ export default {
       }
       return outp;
     },
-    findTopValues: function() {
+    findTopValues: function () {
       /**
        * Find probs for highest predicted indices from findIndicesOfMax
        */
@@ -229,7 +234,7 @@ export default {
         outp[i] = this.raw_predictions[indices[i]];
       return outp;
     },
-    getTopClassNames: function() {
+    getTopClassNames: function () {
       /**
        * Find classes for highest predicted indices from findIndicesOfMax
        */
@@ -239,7 +244,7 @@ export default {
         outp[i] = this.getClassNames[indices[i]];
       return outp;
     },
-    getBar: function() {
+    getBar: function () {
       /**
        * Get specification of eCharts bar chart
        */
@@ -248,21 +253,21 @@ export default {
           type: "category",
           data: this.getTopClassNames,
           axisLabel: {
-            rotate: 45
-          }
+            rotate: 45,
+          },
         },
         yAxis: {
-          type: "value"
+          type: "value",
         },
         series: [
           {
             data: this.findTopValues,
-            type: "bar"
-          }
-        ]
+            type: "bar",
+          },
+        ],
       };
     },
-    getClassNames: function() {
+    getClassNames: function () {
       /**
        * Get all classes from models
        */
@@ -272,44 +277,44 @@ export default {
         return BIG_CLASS_NAMES;
       }
     },
-    getLengthNames: function() {
+    getLengthNames: function () {
       /**
        * Get number of classes from the model
        */
       return this.getClassNames.length;
-    }
+    },
   },
   watch: {
-    brushWidth: function(val) {
+    brushWidth: function (val) {
       this.canvas.freeDrawingBrush.width = val;
-    }
+    },
   },
   mounted() {
     this.loadingModelOver = false;
 
     if (Object.entries(this.small_ranking).length === 0) {
-      SMALL_CLASS_NAMES.forEach(c => (this.small_ranking[c] = 0));
+      SMALL_CLASS_NAMES.forEach((c) => (this.small_ranking[c] = 0));
     }
     if (Object.entries(this.big_ranking).length === 0) {
-      BIG_CLASS_NAMES.forEach(c => (this.big_ranking[c] = 0));
+      BIG_CLASS_NAMES.forEach((c) => (this.big_ranking[c] = 0));
     }
 
     this.canvas = new fabric.Canvas("c", {
-      isDrawingMode: true
+      isDrawingMode: true,
     });
     this.canvas.backgroundColor = "#FFFFFF";
     this.canvas.freeDrawingBrush.width = this.brushWidth;
     this.canvas.renderAll();
 
     let that = this;
-    this.canvas.on("mouse:up", function(e) {
+    this.canvas.on("mouse:up", function (e) {
       that.submitCanvas();
       that.mousePressed = false;
     });
-    this.canvas.on("mouse:down", function(e) {
+    this.canvas.on("mouse:down", function (e) {
       that.mousePressed = true;
     });
-    this.canvas.on("mouse:move", function(e) {
+    this.canvas.on("mouse:move", function (e) {
       that.recordCoor(e);
     });
 
@@ -318,15 +323,15 @@ export default {
 
     Promise.all([
       this.small_model.loadModel(SMALL_MODEL_URL),
-      this.big_model.loadModel(BIG_MODEL_URL)
+      this.big_model.loadModel(BIG_MODEL_URL),
     ]).then(() => {
       this.loadingModelOver = true;
     });
   },
 
-  beforeDestroy: function() {
+  beforeDestroy: function () {
     disposeTFVariables();
-  }
+  },
 };
 </script>
 
